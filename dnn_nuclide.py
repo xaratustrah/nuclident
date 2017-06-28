@@ -27,6 +27,8 @@ __version__ = '0.0.1'
 
 def prepare():
     ame_data = AMEData(DummyIFace())
+
+    # create reference particle
     p = Particle(6, 6, ame_data, Ring('ESR', 108.5))
     p.qq = 3
     p.ke_u = 422
@@ -38,11 +40,12 @@ def prepare():
     for pp in p.get_isobars():
         print(pp)
     # get some nuclides
-    some_nuclides = p.get_nuclides(20, 92, 40, 143, 10)
+    nuclides = p.get_all_in_all()
+    #nuclides = p.get_nuclides(20, 92, 40, 143, 10)
     nuclidic_data = np.array([])
-    for pp in some_nuclides:
+    for pp in nuclides:
         nuclidic_data = np.append(
-            nuclidic_data, [pp.tbl_zz, pp.tbl_nn, pp.qq, pp.get_ionic_moq()])
+            nuclidic_data, [pp.tbl_zz, pp.tbl_nn, pp.qq, pp.get_magnetic_rigidity()])
         nuclidic_data = np.reshape(
             nuclidic_data, (int(len(nuclidic_data) / 4), 4))
 

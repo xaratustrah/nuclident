@@ -90,8 +90,8 @@ class NeuralNetwork:
             print(pp)
         # get some nuclides
         # nuclides = p.get_all_in_all()
-        nuclides = p.get_nuclides(57, 59, 81, 83, 2)
-        #nuclides = p.get_nuclides(20, 92, 40, 143, 10)
+        # nuclides = p.get_nuclides(57, 59, 81, 83, 2)
+        nuclides = p.get_nuclides(20, 92, 40, 143, 10)
         self.n_rows = int(len(nuclides))
 
         self.nuclidic_data = np.array([])

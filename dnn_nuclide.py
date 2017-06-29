@@ -48,6 +48,8 @@ class NeuralNetwork:
             self.nuclidic_data = hf[self.file_basename][:]
         with open('{}.pik'.format(self.file_basename), 'rb') as fp:
             self.nuclidic_labels = pickle.load(fp)
+        self.n_rows = len(self.nuclidic_labels)
+        self.n_cols = np.shape(self.nuclidic_data)[1]
 
     def save_model_to_file(self):
         print('Saving model to file...')
@@ -88,8 +90,8 @@ class NeuralNetwork:
             print(pp)
         # get some nuclides
         # nuclides = p.get_all_in_all()
-        # nuclides = p.get_nuclides(57, 59, 81, 83, 2)
-        nuclides = p.get_nuclides(20, 92, 40, 143, 10)
+        nuclides = p.get_nuclides(57, 59, 81, 83, 2)
+        #nuclides = p.get_nuclides(20, 92, 40, 143, 10)
         self.n_rows = int(len(nuclides))
 
         self.nuclidic_data = np.array([])
@@ -107,11 +109,9 @@ class NeuralNetwork:
 
         # print(self.nuclidic_labels)
         self.nuclidic_data = np.reshape(
-            self.nuclidic_data, (self.n_rows, 2))
+            self.nuclidic_data, (self.n_rows, self.n_cols))
 
     def train(self):
-        self.n_rows = len(self.nuclidic_labels)
-
         one_hot = np.identity(self.n_rows)
 
         # print(one_hot)
@@ -119,9 +119,6 @@ class NeuralNetwork:
         # print(self.nuclidic_labels)
         # print(self.n_rows)
         # print(self.n_cols)
-
-        # Create the network model
-        self.define_net(self.n_cols, self.n_rows)
 
         # Start training (apply gradient descent algorithm)
         self.model.fit(self.nuclidic_data, one_hot, n_epoch=3,
@@ -160,10 +157,16 @@ if __name__ == '__main__':
 
     elif args.train:
         dnn.load_data_from_file()
+        # Create the network model
+        dnn.define_net(dnn.n_cols, dnn.n_rows)
         dnn.train()
         dnn.save_model_to_file()
 
     elif args.predict:
+        # load the data to find out their sizes
+        dnn.load_data_from_file()
+        # Create the network model
+        dnn.define_net(dnn.n_cols, dnn.n_rows)
         dnn.load_model_from_file()
         dnn.predict()
 

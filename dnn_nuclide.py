@@ -90,8 +90,8 @@ class NeuralNetwork:
             print(pp)
         # get some nuclides
         # nuclides = p.get_all_in_all()
-        # nuclides = p.get_nuclides(57, 59, 81, 83, 2)
-        nuclides = p.get_nuclides(20, 92, 40, 143, 10)
+        nuclides = p.get_nuclides(57, 59, 81, 83, 2)
+        #nuclides = p.get_nuclides(20, 92, 40, 143, 10)
         self.n_rows = int(len(nuclides))
 
         self.nuclidic_data = np.array([])
@@ -172,7 +172,10 @@ if __name__ == '__main__':
 
     elif args.all:
         dnn.prepare()
+        dnn.save_data_to_file()
+        dnn.define_net(dnn.n_cols, dnn.n_rows)
         dnn.train()
+        dnn.save_model_to_file()
         dnn.predict()
     else:
         print('Nothing to do.')

@@ -37,7 +37,7 @@ class NeuralNetwork:
         print('Saving', self.n_rows, 'species into HDF5...')
         # write HDF5
         with h5py.File('{}.h5'.format(self.file_basename), 'w') as hf:
-            hf.create_dataset(self.file_basename,  data=self.nuclidic_data)
+            hf.create_dataset('nuclidic_data',  data=self.nuclidic_data)
 
         with open('{}.pik'.format(self.file_basename), 'wb') as fp:
             pickle.dump(self.nuclidic_labels, fp)
@@ -45,7 +45,7 @@ class NeuralNetwork:
     def load_data_from_file(self):
         print('Reading data...')
         with h5py.File('{}.h5'.format(self.file_basename), 'r') as hf:
-            self.nuclidic_data = hf[self.file_basename][:]
+            self.nuclidic_data = hf['nuclidic_data'][:]
         with open('{}.pik'.format(self.file_basename), 'rb') as fp:
             self.nuclidic_labels = pickle.load(fp)
         self.n_rows = len(self.nuclidic_labels)
@@ -114,11 +114,11 @@ class NeuralNetwork:
     def train(self):
         one_hot = np.identity(self.n_rows)
 
-        # print(one_hot)
-        # print(self.nuclidic_data)
-        # print(self.nuclidic_labels)
-        # print(self.n_rows)
-        # print(self.n_cols)
+        print(one_hot)
+        print(self.nuclidic_data)
+        print(self.nuclidic_labels)
+        print(self.n_rows)
+        print(self.n_cols)
 
         # Start training (apply gradient descent algorithm)
         self.model.fit(self.nuclidic_data, one_hot, n_epoch=3,
@@ -126,36 +126,37 @@ class NeuralNetwork:
                        batch_size=4, show_metric=True)
 
     def predict(self):
-        dut = np.array([7.98469972, 0.])
+        dut = np.array([2.00510989, 8.18586111])  # 140La56+
         pred = self.model.predict([dut])
-        print(pred)
+        print('Identified nuclide:', self.nuclidic_labels[np.argmax(pred)])
 
 
 # ===============
 
 if __name__ == '__main__':
-    scriptname = 'dnn_nuclide'
+    scriptname = 'nuclident'
     parser = argparse.ArgumentParser()
+
     parser.add_argument(
-        "-p", "--prepare", help="Prepare the network", action="store_true")
+        "-p", "--prepare", help="Prepare the network", nargs='?', type=str, default=None)
     parser.add_argument(
-        "-t", "--train", help="Train neural network.", action="store_true")
+        "-t", "--train", help="Train neural network.", nargs='?', type=str, default=None)
     parser.add_argument(
-        "-d", "--predict", help="Predict", action="store_true")
+        "-d", "--predict", help="Predict", nargs='?', type=str, default=None)
     parser.add_argument(
-        "-a", "--all", help="Do it all", action="store_true")
+        "-a", "--all", help="Do it all", nargs='?', type=str, default=None)
 
     args = parser.parse_args()
 
     print('{} {}'.format(scriptname, __version__))
 
-    dnn = NeuralNetwork('dnn_nuclide')
-
     if args.prepare:
+        dnn = NeuralNetwork(args.prepare)
         dnn.prepare()
         dnn.save_data_to_file()
 
     elif args.train:
+        dnn = NeuralNetwork(args.train)
         dnn.load_data_from_file()
         # Create the network model
         dnn.define_net(dnn.n_cols, dnn.n_rows)
@@ -163,6 +164,7 @@ if __name__ == '__main__':
         dnn.save_model_to_file()
 
     elif args.predict:
+        dnn = NeuralNetwork(args.predict)
         # load the data to find out their sizes
         dnn.load_data_from_file()
         # Create the network model
@@ -171,6 +173,7 @@ if __name__ == '__main__':
         dnn.predict()
 
     elif args.all:
+        dnn = NeuralNetwork(args.all)
         dnn.prepare()
         dnn.save_data_to_file()
         dnn.define_net(dnn.n_cols, dnn.n_rows)
